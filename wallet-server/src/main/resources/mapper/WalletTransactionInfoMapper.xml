@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.wallet.repository.mapper.WalletTransactionInfoMapper">
+
+    <insert id="insertWalletTransactionInfo" parameterType="com.example.wallet.repository.po.WalletTransactionInfoPO">
+        INSERT INTO wallet_transaction_info(wtx_id, order_id, wallet_id, wtx_amount,
+            wtx_status, wtx_type, wtx_channel, wtx_extension_id)
+        VALUES(#{wtxId}, #{orderId}, #{walletId}, #{wtxAmount},
+            #{wtxStatus}, #{wtxType}, #{wtxChannel}, #{wtxExtensionId})
+    </insert>
+
+    <insert id="insertWalletTransactionInfoFromPool" parameterType="string">
+        INSERT INTO wallet_transaction_info(wtx_id, order_id, wallet_id, wtx_amount,
+            wtx_status, wtx_type, wtx_channel, wtx_extension_id)
+        SELECT wtx_id, order_id, wallet_id, wtx_amount,
+            wtx_status, wtx_type, wtx_channel, wtx_extension_id
+        FROM wallet_transaction_pool
+        WHERE wtx_id = #{wtxId}
+    </insert>
+
+    <select id="listWalletTransactionInfoByWalletId" resultType="com.example.wallet.repository.po.WalletTransactionInfoPO">
+        SELECT wtx_id, order_id, wallet_id, wtx_amount, wallet_balance_his,
+            wtx_status, wtx_type, wtx_channel, wtx_extension_id, c_time
+        FROM wallet_transaction_info
+        WHERE wallet_id = #{walletId}
+            AND wtx_status = 3
+        ORDER BY c_time DESC
+    </select>
+
+</mapper>

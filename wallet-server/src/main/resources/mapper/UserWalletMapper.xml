@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.wallet.repository.mapper.UserWalletMapper">
+
+    <select id="getUserWalletByWalletId" resultType="com.example.wallet.repository.po.UserWalletPO">
+        SELECT wallet_id, user_id, wallet_balance
+        FROM user_wallet
+        WHERE wallet_id = #{walletId} LIMIT 1
+    </select>
+
+    <select id="getUserWalletByUserIdForUpdate" resultType="com.example.wallet.repository.po.UserWalletPO">
+        SELECT wallet_id, user_id, wallet_balance
+        FROM user_wallet
+        WHERE user_id = #{userId} LIMIT 1 FOR UPDATE
+    </select>
+
+    <update id="updateWalletBalance"  parameterType="string">
+        UPDATE user_wallet
+        SET wallet_balance = #{balance}
+        WHERE wallet_id = #{walletId}
+    </update>
+
+</mapper>

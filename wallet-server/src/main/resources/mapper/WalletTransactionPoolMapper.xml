@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.wallet.repository.mapper.WalletTransactionPoolMapper">
+
+    <insert id="insert" parameterType="com.example.wallet.repository.po.WalletTransactionPoolPO">
+        INSERT INTO wallet_transaction_pool(wtx_id, order_id) VALUES(#{wtxId}, #{orderId})
+    </insert>
+
+    <delete id="deleteByWtxId" parameterType="string">
+        DELETE FROM wallet_transaction_pool WHERE wtx_id = #{wtxId}
+    </delete>
+
+    <select id="getActiveWalletTransactionByOrderId" resultType="com.example.wallet.repository.po.WalletTransactionInfoPO">
+        SELECT txi.wtx_id, txi.order_id, txi.wtx_status
+        FROM wallet_transaction_pool txp
+            LEFT JOIN wallet_transaction_info txi ON txi.wtx_id = txp.wtx_id
+            AND txi.wtx_status IN ( 1, 2 )
+            AND txi.status = 1
+        WHERE txp.order_id = #{orderId} LIMIT 1
+    </select>
+
+    <update id="updateWalletTransactionInfo" parameterType="com.example.wallet.repository.po.WalletTransactionInfoPO">
+        UPDATE wallet_transaction_info
+        <set>
+            <if test="wtxId != null">
+                wtx_id = #{wtxId},
+            </if>
+            <if test="orderId != null">
+                order_id = #{orderId},
+            </if>
+            <if test="walletId != null">
+                wallet_id = #{walletId}
+            </if>
+            <if test="wtxAmount != null">
+                wtx_amount = #{wtxAmount}
+            </if>
+            <if test="walletBalanceHis != null">
+                wallet_balance_his = #{walletBalanceHis}
+            </if>
+            <if test="wtxStatus != null">
+                wtx_status = #{wtxStatus}
+            </if>
+            <if test="wtxType != null">
+                wtx_type = #{wtxType}
+            </if>
+            <if test="wtxChannel != null">
+                wtx_channel = #{wtxChannel}
+            </if>
+            <if test="wtxExtensionId != null">
+                wtx_extension_id = #{wtxExtensionId}
+            </if>
+        </set>
+        WHERE wtx_id = #{wtxId}
+    </update>
+
+    <delete id="deleteTimeoutTransaction" parameterType="string">
+        DELETE FROM wallet_transaction_pool
+        WHERE c_time &lt; #{lastTime}
+    </delete>
+
+</mapper>
