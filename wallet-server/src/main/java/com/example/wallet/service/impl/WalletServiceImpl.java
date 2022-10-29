@@ -109,7 +109,7 @@ public class WalletServiceImpl implements WalletService {
             return txRes.setResCode(TxResultCode.PROCESSING);
         }
 
-        //TODO 服务间调用, 通过订单id获取订单交易金额、用户id等
+        //TODO 服务间调用, 通过订单id获取订单交易金额、用户id等, 还需要校验订单是否生效
         String userId;
         String orderAmountStr;
         try {

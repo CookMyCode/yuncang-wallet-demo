@@ -4,8 +4,6 @@ import com.example.wallet.common.resp.RespPage;
 import com.example.wallet.dto.TransactionDTO;
 import com.example.wallet.dto.UserWalletDTO;
 import com.example.wallet.dto.WalletTransactionInfoDTO;
-import com.example.wallet.repository.po.WalletTransactionInfoPO;
-import com.github.pagehelper.PageInfo;
 
 import java.util.function.Function;
 

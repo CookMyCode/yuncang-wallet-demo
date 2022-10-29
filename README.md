@@ -37,7 +37,7 @@ ddl 在 wallet-server模块下路径 src/main/resources/db/migration/
 
 ### 模块以及框架
 我将钱包支付和其他支付方式视为同一级别的服务，也是为了方便维护，所以放到一个单独的微服务中。  
-使用的仍然是传统的三层接口，每层都需要进行bean的转换，持久层返回PO，服务层返回DTO，接口层返回VO。  
+使用的仍然是传统的三层结构，每层都需要进行bean的转换，持久层返回PO，服务层返回DTO，接口层返回VO。  
 主要使用了 springboot、myBatis、mySql。    
 
 ### 接口设计

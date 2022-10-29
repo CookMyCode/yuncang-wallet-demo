@@ -21,8 +21,10 @@ public class TransactionPoolCleanScheduler {
 
     @Scheduled(cron = "0 0 2,13 * * ?")
     public void cleanTimeoutTransaction() {
-        String lastTime = DateFormatUtils.format(DateUtils.addHours(new Date(), 1),
-                "yyyy-MM-dd HH:mm:ss.SSS");
+        String lastTime = DateFormatUtils.format(
+                DateUtils.addHours(new Date(), 1)
+                , "yyyy-MM-dd HH:mm:ss.SSS"
+        );
         walletTransactionPoolMapper.deleteTimeoutTransaction(lastTime);
     }
 
