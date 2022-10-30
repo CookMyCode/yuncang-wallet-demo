@@ -8,7 +8,7 @@ public interface UserWalletMapper {
 
     UserWalletPO getUserWalletByWalletId(String walletId);
 
-    UserWalletPO getUserWalletByUserIdForUpdate(String userId);
+    UserWalletPO getUserWalletByUserIdLockShare(String userId);
 
     int updateWalletBalance(String walletId, String balance);
 

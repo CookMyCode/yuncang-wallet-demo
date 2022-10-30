@@ -150,8 +150,8 @@ public class WalletServiceImpl implements WalletService {
     public void postProcessTransaction(TransactionDTO txRes, Function<TransactionDTO, TransactionDTO> processor) {
         String userId = txRes.getUserId();
         String orderAmountStr = txRes.getOrderAmount();
-        // 获取钱包信息 for update 加锁
-        UserWalletPO userWallet = userWalletMapper.getUserWalletByUserIdForUpdate(userId);
+        // 获取钱包信息 LOCK IN SHARE MODE 加锁
+        UserWalletPO userWallet = userWalletMapper.getUserWalletByUserIdLockShare(userId);
         String walletId = userWallet.getWalletId();
         String walletBalanceStr = userWallet.getWalletBalance();
         txRes.setWalletId(walletId).setWalletBalanceHis(walletBalanceStr);

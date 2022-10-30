@@ -8,10 +8,10 @@
         WHERE wallet_id = #{walletId} LIMIT 1
     </select>
 
-    <select id="getUserWalletByUserIdForUpdate" resultType="com.example.wallet.repository.po.UserWalletPO">
+    <select id="getUserWalletByUserIdLockShare" resultType="com.example.wallet.repository.po.UserWalletPO">
         SELECT wallet_id, user_id, wallet_balance
         FROM user_wallet
-        WHERE user_id = #{userId} LIMIT 1 FOR UPDATE
+        WHERE user_id = #{userId} LIMIT 1 LOCK IN SHARE MODE
     </select>
 
     <update id="updateWalletBalance"  parameterType="string">
