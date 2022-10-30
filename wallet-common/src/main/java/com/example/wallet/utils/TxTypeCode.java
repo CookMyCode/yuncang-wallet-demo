@@ -5,12 +5,12 @@ import lombok.Getter;
 
 @AllArgsConstructor
 @Getter
-public enum TxResultCode {
+public enum TxTypeCode {
 
-    SUCCESS(1, "交易处理成功"),
-    INSUFFICIENT(2, "余额不足"),
-    DUPLICATE(3, "订单重复"),
-    FAIL(4, "交易处理失败");
+    RECHARGE(1, "充值"),
+    WITHDRAWAL(2, "提现"),
+    PAY(3, "消费"),
+    REFUND(4, "退款");
 
     private final Integer code;
     private final String msg;

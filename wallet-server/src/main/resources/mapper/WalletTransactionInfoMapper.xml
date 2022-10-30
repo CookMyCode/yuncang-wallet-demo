@@ -11,9 +11,9 @@
 
     <insert id="insertWalletTransactionInfoFromPool" parameterType="string">
         INSERT INTO wallet_transaction_info(wtx_id, order_id, wallet_id, wtx_amount,
-            wtx_status, wtx_type, wtx_channel, wtx_extension_id)
+            wtx_status, wtx_type, wtx_channel, wtx_extension_id, wallet_balance_his)
         SELECT wtx_id, order_id, wallet_id, wtx_amount,
-            wtx_status, wtx_type, wtx_channel, wtx_extension_id
+            wtx_status, wtx_type, wtx_channel, wtx_extension_id, wallet_balance_his
         FROM wallet_transaction_pool
         WHERE wtx_id = #{wtxId}
     </insert>

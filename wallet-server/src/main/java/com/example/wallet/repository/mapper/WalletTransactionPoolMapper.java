@@ -13,7 +13,7 @@ public interface WalletTransactionPoolMapper {
 
     WalletTransactionInfoPO getActiveWalletTransactionByOrderId(String orderId);
 
-    int updateWalletTransactionInfo(WalletTransactionInfoPO po);
+    int updateWalletTransactionPool(WalletTransactionInfoPO po);
 
     int deleteTimeoutTransaction(String lastTime);
 

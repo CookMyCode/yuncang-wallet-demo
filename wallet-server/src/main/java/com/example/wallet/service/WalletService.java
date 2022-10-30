@@ -4,6 +4,7 @@ import com.example.wallet.common.resp.RespPage;
 import com.example.wallet.dto.TransactionDTO;
 import com.example.wallet.dto.UserWalletDTO;
 import com.example.wallet.dto.WalletTransactionInfoDTO;
+import com.example.wallet.utils.TxTypeCode;
 
 import java.util.function.Function;
 
@@ -35,7 +36,7 @@ public interface WalletService {
     /**
      * 交易处理
      */
-    TransactionDTO walletTransaction(String orderId, Function<TransactionDTO, TransactionDTO> processor);
+    TransactionDTO walletTransaction(String orderId, Function<TransactionDTO, TransactionDTO> processor, TxTypeCode txType);
 
     /**
      * 交易处理流程

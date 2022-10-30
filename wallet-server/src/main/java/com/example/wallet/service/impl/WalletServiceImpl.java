@@ -14,6 +14,7 @@ import com.example.wallet.service.WalletService;
 import com.example.wallet.utils.BeanCopyUtils;
 import com.example.wallet.utils.IdGenerator;
 import com.example.wallet.utils.TxResultCode;
+import com.example.wallet.utils.TxTypeCode;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import lombok.extern.slf4j.Slf4j;
@@ -53,29 +54,28 @@ public class WalletServiceImpl implements WalletService {
     @Override
     public TransactionDTO pay(String orderId) {
         return walletTransaction(orderId, dto -> {
-            dto.setWtxType(3);
             BigDecimal walletBalance = new BigDecimal(dto.getWalletBalanceHis());
             BigDecimal orderAmount = new BigDecimal(dto.getOrderAmount());
             // 检查钱包余额是否足够支付
             BigDecimal balanceAfterTx = walletBalance.subtract(orderAmount);
             if (new BigDecimal("0").compareTo(balanceAfterTx) > 0) {
+                log.warn("钱包余额不足 walletId:{}", dto.getWalletId());
                 return dto.setResCode(TxResultCode.INSUFFICIENT);
             }
             return dto.setBalanceAfterTx(balanceAfterTx.setScale(2, RoundingMode.DOWN).toPlainString())
                     .setResCode(TxResultCode.SUCCESS);
-        });
+        }, TxTypeCode.PAY);
     }
 
     @Override
     public TransactionDTO refund(String orderId) {
         return walletTransaction(orderId, dto -> {
-            dto.setWtxType(4);
             BigDecimal walletBalance = new BigDecimal(dto.getWalletBalanceHis());
             BigDecimal orderAmount = new BigDecimal(dto.getOrderAmount());
             BigDecimal balanceAfterTx = walletBalance.add(orderAmount);
             return dto.setBalanceAfterTx(balanceAfterTx.setScale(2, RoundingMode.DOWN).toPlainString())
                     .setResCode(TxResultCode.SUCCESS);
-        });
+        }, TxTypeCode.REFUND);
     }
 
     @Override
@@ -94,19 +94,20 @@ public class WalletServiceImpl implements WalletService {
     }
 
     @Override
-    public TransactionDTO walletTransaction(String orderId, Function<TransactionDTO, TransactionDTO> processor) {
+    public TransactionDTO walletTransaction(String orderId, Function<TransactionDTO, TransactionDTO> processor, TxTypeCode txType) {
         TransactionDTO txRes = new TransactionDTO();
         // 新增一笔交易, 写入wallet_transaction_pool表, orderId是唯一索引, 用于防止重复请求
         String wtxId = IdGenerator.getId();
-        txRes.setOrderId(orderId).setWtxId(wtxId);
+        txRes.setOrderId(orderId).setWtxId(wtxId).setWtxType(txType);
         try {
             // 如果交易处理期间没有发生异常则会在表中一直保留, 直到被定时器删除TransactionPoolCleanScheduler.cleanTimeoutTransaction
             walletTransactionPoolMapper.insert(new WalletTransactionPoolPO()
                     .setWtxId(wtxId)
-                    .setOrderId(orderId));
+                    .setOrderId(orderId)
+                    .setWtxType(txType.getCode()));
         } catch (Exception e) {
-            log.warn("订单已处于交易处理中 ", e);
-            return txRes.setResCode(TxResultCode.PROCESSING);
+            log.warn("订单重复 ", e);
+            return txRes.setResCode(TxResultCode.DUPLICATE);
         }
 
         //TODO 服务间调用, 通过订单id获取订单交易金额、用户id等, 还需要校验订单是否生效
@@ -135,11 +136,19 @@ public class WalletServiceImpl implements WalletService {
             walletService.postProcessTransaction(txRes, processor);
         } catch (Exception e) {
             log.error("钱包交易处理异常 ", e);
-            // 记录交易失败信息
-            walletService.recordTransactionInfo(txRes.setResCode(TxResultCode.FAIL));
+            txRes.setResCode(TxResultCode.FAIL);
+        }
+
+        // 判断交易是否失败
+        if (!TxResultCode.SUCCESS.getCode().equals(txRes.getResCode().getCode())) {
+            try {
+                // 记录交易失败信息
+                walletService.recordTransactionInfo(txRes);
+            } catch (Exception e) {
+                log.error("日志写入失败 ", e);
+            }
             // 删除交易, 否则在定时任务清理前，支付都无法再次发起
             walletTransactionPoolMapper.deleteByWtxId(wtxId);
-            return txRes;
         }
 
         return txRes;
@@ -152,6 +161,10 @@ public class WalletServiceImpl implements WalletService {
         String orderAmountStr = txRes.getOrderAmount();
         // 获取钱包信息 LOCK IN SHARE MODE 加锁
         UserWalletPO userWallet = userWalletMapper.getUserWalletByUserIdLockShare(userId);
+        if (userWallet == null) {
+            log.error("钱包不存在 userId:{}", userId);
+            throw new RuntimeException("钱包不存在");
+        }
         String walletId = userWallet.getWalletId();
         String walletBalanceStr = userWallet.getWalletBalance();
         txRes.setWalletId(walletId).setWalletBalanceHis(walletBalanceStr);
@@ -173,13 +186,13 @@ public class WalletServiceImpl implements WalletService {
     public void recordTransactionInfo(TransactionDTO txRes) {
         String wtxId = txRes.getWtxId();
         // 更新交易信息
-        walletTransactionPoolMapper.updateWalletTransactionInfo(new WalletTransactionInfoPO()
+        walletTransactionPoolMapper.updateWalletTransactionPool(new WalletTransactionInfoPO()
                 .setWtxId(wtxId)
                 .setOrderId(txRes.getOrderId())
                 .setWalletId(txRes.getWalletId())
                 .setWtxAmount(txRes.getOrderAmount())
                 .setWalletBalanceHis(txRes.getWalletBalanceHis())
-                .setWtxType(txRes.getWtxType())
+                .setWtxType(txRes.getWtxType().getCode())
                 .setWtxChannel(1)
                 .setWtxStatus(TxResultCode.SUCCESS.getCode().equals(txRes.getResCode().getCode()) ? 3 : 4));
         // 复制信息到wallet_transaction_info表

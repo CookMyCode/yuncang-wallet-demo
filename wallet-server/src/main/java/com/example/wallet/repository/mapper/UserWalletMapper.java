@@ -2,6 +2,7 @@ package com.example.wallet.repository.mapper;
 
 import com.example.wallet.repository.po.UserWalletPO;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 @Mapper
 public interface UserWalletMapper {
@@ -10,6 +11,6 @@ public interface UserWalletMapper {
 
     UserWalletPO getUserWalletByUserIdLockShare(String userId);
 
-    int updateWalletBalance(String walletId, String balance);
+    int updateWalletBalance(@Param("walletId") String walletId, @Param("balance") String balance);
 
 }

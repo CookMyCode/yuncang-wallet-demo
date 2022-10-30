@@ -1,6 +1,7 @@
 package com.example.wallet.dto;
 
 import com.example.wallet.utils.TxResultCode;
+import com.example.wallet.utils.TxTypeCode;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
@@ -53,6 +54,6 @@ public class TransactionDTO {
     /**
      * 动账类型, 1:充值 2:提现 3:消费 4:退款 5:冲正
      */
-    private int wtxType;
+    private TxTypeCode wtxType;
 
 }

@@ -15,6 +15,10 @@ mybatis:
   configuration:
     map-underscore-to-camel-case: true
 
+logging:
+  level:
+    com.example.wallet.repository.mapper: trace
+
 pagehelper:
   helperDialect: mysql
   reasonable: true

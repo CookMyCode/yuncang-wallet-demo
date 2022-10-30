@@ -3,7 +3,7 @@
 <mapper namespace="com.example.wallet.repository.mapper.WalletTransactionPoolMapper">
 
     <insert id="insert" parameterType="com.example.wallet.repository.po.WalletTransactionPoolPO">
-        INSERT INTO wallet_transaction_pool(wtx_id, order_id) VALUES(#{wtxId}, #{orderId})
+        INSERT INTO wallet_transaction_pool(wtx_id, order_id, wtx_type) VALUES(#{wtxId}, #{orderId}, #{wtxType})
     </insert>
 
     <delete id="deleteByWtxId" parameterType="string">
@@ -19,8 +19,8 @@
         WHERE txp.order_id = #{orderId} LIMIT 1
     </select>
 
-    <update id="updateWalletTransactionInfo" parameterType="com.example.wallet.repository.po.WalletTransactionInfoPO">
-        UPDATE wallet_transaction_info
+    <update id="updateWalletTransactionPool" parameterType="com.example.wallet.repository.po.WalletTransactionInfoPO">
+        UPDATE wallet_transaction_pool
         <set>
             <if test="wtxId != null">
                 wtx_id = #{wtxId},
@@ -29,25 +29,25 @@
                 order_id = #{orderId},
             </if>
             <if test="walletId != null">
-                wallet_id = #{walletId}
+                wallet_id = #{walletId},
             </if>
             <if test="wtxAmount != null">
-                wtx_amount = #{wtxAmount}
+                wtx_amount = #{wtxAmount},
             </if>
             <if test="walletBalanceHis != null">
-                wallet_balance_his = #{walletBalanceHis}
+                wallet_balance_his = #{walletBalanceHis},
             </if>
             <if test="wtxStatus != null">
-                wtx_status = #{wtxStatus}
+                wtx_status = #{wtxStatus},
             </if>
             <if test="wtxType != null">
-                wtx_type = #{wtxType}
+                wtx_type = #{wtxType},
             </if>
             <if test="wtxChannel != null">
-                wtx_channel = #{wtxChannel}
+                wtx_channel = #{wtxChannel},
             </if>
             <if test="wtxExtensionId != null">
-                wtx_extension_id = #{wtxExtensionId}
+                wtx_extension_id = #{wtxExtensionId},
             </if>
         </set>
         WHERE wtx_id = #{wtxId}

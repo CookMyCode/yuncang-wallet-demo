@@ -10,9 +10,11 @@ import com.example.wallet.dto.UserWalletDTO;
 import com.example.wallet.dto.WalletTransactionInfoDTO;
 import com.example.wallet.service.WalletService;
 import com.example.wallet.utils.BeanCopyUtils;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 
+@RestController
 public class WalletClientImpl implements WalletClient {
 
     @Resource

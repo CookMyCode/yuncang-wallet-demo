@@ -14,7 +14,7 @@
         WHERE user_id = #{userId} LIMIT 1 LOCK IN SHARE MODE
     </select>
 
-    <update id="updateWalletBalance"  parameterType="string">
+    <update id="updateWalletBalance">
         UPDATE user_wallet
         SET wallet_balance = #{balance}
         WHERE wallet_id = #{walletId}
