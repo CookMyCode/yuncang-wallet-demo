@@ -139,14 +139,15 @@ public class WalletServiceImpl implements WalletService {
             txRes.setResCode(TxResultCode.FAIL);
         }
 
+        try {
+            // 记录交易信息
+            walletService.recordTransactionInfo(txRes);
+        } catch (Exception e) {
+            log.error("日志写入失败 ", e);
+        }
+
         // 判断交易是否失败
         if (!TxResultCode.SUCCESS.getCode().equals(txRes.getResCode().getCode())) {
-            try {
-                // 记录交易失败信息
-                walletService.recordTransactionInfo(txRes);
-            } catch (Exception e) {
-                log.error("日志写入失败 ", e);
-            }
             // 删除交易, 否则在定时任务清理前，支付都无法再次发起
             walletTransactionPoolMapper.deleteByWtxId(wtxId);
         }
@@ -176,9 +177,8 @@ public class WalletServiceImpl implements WalletService {
         // 更新钱包余额
         userWalletMapper.updateWalletBalance(walletId, txRes.getBalanceAfterTx());
 
-        // 记录交易信息
-        WalletService walletService = applicationContext.getBean(WalletService.class);
-        walletService.recordTransactionInfo(txRes.setResCode(TxResultCode.SUCCESS));
+        // 标记为交易成功
+        txRes.setResCode(TxResultCode.SUCCESS);
     }
 
     @Transactional
