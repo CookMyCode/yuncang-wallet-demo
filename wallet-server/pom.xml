@@ -54,6 +54,35 @@
     </dependencies>
 
     <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <!-- 开启替换application.properties中参数的功能 -->
+                <filtering>true</filtering>
+                <!-- 先排除所有配置 -->
+                <excludes>
+                    <exclude>/application-*.yml</exclude>
+                </excludes>
+            </resource>
+            <resource>
+                <!-- 再引入指定配置 -->
+                <directory>src/main/resources</directory>
+                <includes>
+                    <include>/application-${profiles.active}.yml</include>
+                </includes>
+            </resource>
+        </resources>
+
+        <testResources>
+            <!-- 单元测试需要引用的资源 -->
+            <testResource>
+                <directory>src/test/resource</directory>
+            </testResource>
+            <testResource>
+                <directory>src/main/resource</directory>
+            </testResource>
+        </testResources>
+
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
